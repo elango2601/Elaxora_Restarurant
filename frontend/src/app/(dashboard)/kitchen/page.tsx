@@ -97,7 +97,7 @@ export default function KitchenDashboard() {
     }
   }
 
-  const preparingOrders = orders.filter(o => o.status === 'Preparing')
+  const activeOrders = orders.filter(o => o.status === 'Pending' || o.status === 'Preparing')
 
   return (
     <div className="space-y-6">
@@ -118,9 +118,9 @@ export default function KitchenDashboard() {
       <div className="bg-[#0a0a0c] border border-white/5 rounded-2xl p-6 min-h-[600px]">
         <div className="flex items-center gap-3 mb-6">
           <Flame className="text-red-500" />
-          <h2 className="text-xl font-bold">Currently Preparing</h2>
+          <h2 className="text-xl font-bold">Active Orders</h2>
           <span className="px-3 py-1 bg-red-500/20 text-red-400 text-xs rounded-full ml-auto">
-            {preparingOrders.length} Orders
+            {activeOrders.length} Orders
           </span>
         </div>
 
@@ -128,13 +128,13 @@ export default function KitchenDashboard() {
           <div className="text-center py-20 text-gray-500 border border-dashed border-white/10 rounded-xl">
             Syncing with Staff POS...
           </div>
-        ) : preparingOrders.length === 0 ? (
+        ) : activeOrders.length === 0 ? (
           <div className="text-center py-20 text-gray-500 border border-dashed border-white/10 rounded-xl">
-            No orders being prepared right now. Relax!
+            No active orders right now. Relax!
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {preparingOrders.map(order => (
+            {activeOrders.map(order => (
               <div key={order.id} className="bg-black/60 border border-white/10 rounded-xl overflow-hidden flex flex-col">
                 <div className="bg-brand-gold/10 px-4 py-3 border-b border-brand-gold/20 flex justify-between items-center">
                   <h3 className="font-bold text-white text-lg">{order.id}</h3>
@@ -159,12 +159,21 @@ export default function KitchenDashboard() {
                   </p>
                 </div>
                 <div className="p-4 bg-white/5 mt-auto">
-                  <button 
-                    onClick={() => updateOrderStatus(order.id, 'Ready')}
-                    className="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2"
-                  >
-                    <CheckCircle size={20} /> Mark as Ready
-                  </button>
+                  {order.status === 'Pending' ? (
+                    <button 
+                      onClick={() => updateOrderStatus(order.id, 'Preparing')}
+                      className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2"
+                    >
+                      <Flame size={20} /> Start Preparing
+                    </button>
+                  ) : (
+                    <button 
+                      onClick={() => updateOrderStatus(order.id, 'Ready')}
+                      className="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2"
+                    >
+                      <CheckCircle size={20} /> Mark as Ready
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
