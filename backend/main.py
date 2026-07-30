@@ -638,6 +638,16 @@ async def stripe_webhook(request: Request, db: Session = Depends(database.get_db
         if db_order:
             db_order.status = "Paid"
             db.commit()
+            db.refresh(db_order)
+            
+            # Broadcast the Paid status to all dashboards instantly
+            items = db.query(models.OrderItem).filter(models.OrderItem.order_id == order_id).all()
+            order_dict = schemas.OrderResponse.from_orm(db_order).dict()
+            order_dict["items"] = [schemas.OrderItemResponse.from_orm(item).dict() for item in items]
+            
+            import asyncio
+            asyncio.create_task(kitchen_manager.broadcast(order_dict))
+            asyncio.create_task(manager.broadcast(order_dict))
             
     return {"status": "success"}
 

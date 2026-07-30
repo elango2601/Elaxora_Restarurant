@@ -97,7 +97,7 @@ export default function KitchenDashboard() {
     }
   }
 
-  const activeOrders = orders.filter(o => o.status === 'Pending' || o.status === 'Preparing')
+  const activeOrders = orders.filter(o => o.status === 'Pending' || o.status === 'Preparing' || o.status === 'Paid')
 
   return (
     <div className="space-y-6">
@@ -159,7 +159,7 @@ export default function KitchenDashboard() {
                   </p>
                 </div>
                 <div className="p-4 bg-white/5 mt-auto">
-                  {order.status === 'Pending' ? (
+                  {order.status === 'Pending' || order.status === 'Paid' ? (
                     <button 
                       onClick={() => updateOrderStatus(order.id, 'Preparing')}
                       className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2"
