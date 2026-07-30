@@ -29,7 +29,7 @@ export default function StaffDashboard() {
   const fetchOrders = async () => {
     try {
       const token = document.cookie.split('; ').find(row => row.startsWith('elaxora_token='))?.split('=')[1]
-      const res = await fetch('http://localhost:3001/orders', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/orders`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       const data = await res.json()
@@ -45,14 +45,32 @@ export default function StaffDashboard() {
 
   useEffect(() => {
     fetchOrders()
-    const interval = setInterval(fetchOrders, 5000) // Poll every 5s for live updates
-    return () => clearInterval(interval)
+    
+    // Connect to WebSocket for real-time order updates
+    const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WS_URL || "ws://127.0.0.1:3001"}/ws`)
+    
+    ws.onmessage = (event) => {
+      const payload = JSON.parse(event.data)
+      // Check if it's an order update (orders have an 'id' directly on the payload, reservations are wrapped in {type: "..."})
+      if (payload.id && payload.id.startsWith('ORD-')) {
+        setOrders(prev => {
+          const exists = prev.some(o => o.id === payload.id)
+          if (exists) {
+            return prev.map(o => o.id === payload.id ? payload : o)
+          } else {
+            return [payload, ...prev]
+          }
+        })
+      }
+    }
+
+    return () => ws.close()
   }, [])
 
   const updateOrderStatus = async (id: string, status: string) => {
     try {
       const token = document.cookie.split('; ').find(row => row.startsWith('elaxora_token='))?.split('=')[1]
-      const res = await fetch(`http://localhost:3001/order/${id}/status`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/order/${id}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

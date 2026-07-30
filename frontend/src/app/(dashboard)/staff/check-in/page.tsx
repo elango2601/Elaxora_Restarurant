@@ -46,6 +46,33 @@ export default function CheckInPage() {
 
   useEffect(() => {
     fetchTodayReservations()
+    
+    const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WS_URL || "ws://127.0.0.1:3001"}/ws`)
+    
+    ws.onmessage = (event) => {
+      const payload = JSON.parse(event.data)
+      const todayStr = new Date().toISOString().split('T')[0]
+      
+      if (payload.type === 'new_reservation' || payload.type === 'update_reservation') {
+        const resData = payload.data
+        if (resData.date === todayStr) {
+          setReservations(prev => {
+            const exists = prev.some(r => r.reservation_id === resData.reservation_id)
+            let newArr = []
+            if (exists) {
+              newArr = prev.map(r => r.reservation_id === resData.reservation_id ? resData : r)
+            } else {
+              newArr = [resData, ...prev]
+            }
+            return newArr.sort((a, b) => a.time.localeCompare(b.time))
+          })
+        }
+      } else if (payload.type === 'cancel_reservation') {
+        setReservations(prev => prev.map(r => r.reservation_id === payload.id ? { ...r, status: 'cancelled' } : r))
+      }
+    }
+    
+    return () => ws.close()
   }, [])
 
   const checkInGuest = async (id: string) => {

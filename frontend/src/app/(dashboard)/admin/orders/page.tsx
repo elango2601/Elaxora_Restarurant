@@ -50,7 +50,24 @@ export default function OrdersPage() {
 
   useEffect(() => {
     fetchOrders()
-    // In a real production app, we'd also connect to the WebSocket here to receive live updates!
+    
+    const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WS_URL || "ws://127.0.0.1:3001"}/ws`)
+    
+    ws.onmessage = (event) => {
+      const payload = JSON.parse(event.data)
+      if (payload.id && payload.id.startsWith('ORD-')) {
+        setOrders(prev => {
+          const exists = prev.some(o => o.id === payload.id)
+          if (exists) {
+            return prev.map(o => o.id === payload.id ? payload : o)
+          } else {
+            return [payload, ...prev]
+          }
+        })
+      }
+    }
+
+    return () => ws.close()
   }, [])
 
   const updateStatus = async (id: string, newStatus: string) => {

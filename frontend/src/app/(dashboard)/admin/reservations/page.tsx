@@ -43,6 +43,27 @@ export default function ReservationsPage() {
 
   useEffect(() => {
     fetchReservations()
+    
+    const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WS_URL || "ws://127.0.0.1:3001"}/ws`)
+    
+    ws.onmessage = (event) => {
+      const payload = JSON.parse(event.data)
+      if (payload.type === 'new_reservation' || payload.type === 'update_reservation') {
+        const resData = payload.data
+        setReservations(prev => {
+          const exists = prev.some(r => r.reservation_id === resData.reservation_id)
+          if (exists) {
+            return prev.map(r => r.reservation_id === resData.reservation_id ? resData : r)
+          } else {
+            return [resData, ...prev]
+          }
+        })
+      } else if (payload.type === 'cancel_reservation') {
+        setReservations(prev => prev.map(r => r.reservation_id === payload.id ? { ...r, status: 'cancelled' } : r))
+      }
+    }
+    
+    return () => ws.close()
   }, [])
 
   const updateStatus = async (id: string, newStatus: string) => {

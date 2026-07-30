@@ -106,7 +106,7 @@ def admin_get_reservations(db: Session = Depends(database.get_db)):
     return success_response(res_list)
 
 @app.put("/reservation/{id}", dependencies=[Depends(RoleChecker(["admin", "staff"]))])
-def update_reservation(id: uuid.UUID, res_update: schemas.ReservationUpdate, db: Session = Depends(database.get_db)):
+async def update_reservation(id: uuid.UUID, res_update: schemas.ReservationUpdate, db: Session = Depends(database.get_db)):
     db_res = db.query(models.Reservation).filter(models.Reservation.reservation_id == id).first()
     if not db_res:
         raise HTTPException(status_code=404, detail="Reservation not found")
@@ -117,20 +117,23 @@ def update_reservation(id: uuid.UUID, res_update: schemas.ReservationUpdate, db:
         
     db.commit()
     db.refresh(db_res)
-    return success_response(schemas.ReservationResponse.from_orm(db_res).dict(), "Reservation updated")
+    res_dict = schemas.ReservationResponse.from_orm(db_res).dict()
+    await manager.broadcast({"type": "update_reservation", "data": res_dict})
+    return success_response(res_dict, "Reservation updated")
 
 @app.delete("/reservation/{id}", dependencies=[Depends(RoleChecker(["admin", "staff"]))])
-def cancel_reservation(id: uuid.UUID, db: Session = Depends(database.get_db)):
+async def cancel_reservation(id: uuid.UUID, db: Session = Depends(database.get_db)):
     db_res = db.query(models.Reservation).filter(models.Reservation.reservation_id == id).first()
     if not db_res:
         raise HTTPException(status_code=404, detail="Reservation not found")
     
     db_res.status = 'cancelled'
     db.commit()
+    await manager.broadcast({"type": "cancel_reservation", "id": str(id)})
     return success_response({"id": str(id)}, "Reservation cancelled")
 
 @app.patch("/reservation/status", dependencies=[Depends(RoleChecker(["admin", "staff"]))])
-def update_status(status_update: schemas.ReservationUpdateStatus, db: Session = Depends(database.get_db)):
+async def update_status(status_update: schemas.ReservationUpdateStatus, db: Session = Depends(database.get_db)):
     db_res = db.query(models.Reservation).filter(models.Reservation.reservation_id == status_update.id).first()
     if not db_res:
         raise HTTPException(status_code=404, detail="Reservation not found")
@@ -138,7 +141,9 @@ def update_status(status_update: schemas.ReservationUpdateStatus, db: Session = 
     db_res.status = status_update.status
     db.commit()
     db.refresh(db_res)
-    return success_response(schemas.ReservationResponse.from_orm(db_res).dict(), f"Status updated to {status_update.status}")
+    res_dict = schemas.ReservationResponse.from_orm(db_res).dict()
+    await manager.broadcast({"type": "update_reservation", "data": res_dict})
+    return success_response(res_dict, f"Status updated to {status_update.status}")
 
 # ==============================================================================
 # AUTHENTICATION
@@ -415,7 +420,7 @@ def delete_inventory_item(id: int, db: Session = Depends(database.get_db)):
 # ==============================================================================
 
 @app.post("/checkout", response_model=dict)
-def create_checkout(order_data: schemas.OrderCreate, db: Session = Depends(database.get_db)):
+async def create_checkout(order_data: schemas.OrderCreate, db: Session = Depends(database.get_db)):
     order_id = "ORD-" + str(uuid.uuid4()).split("-")[0].upper()
     
     # Save pending order
@@ -442,6 +447,15 @@ def create_checkout(order_data: schemas.OrderCreate, db: Session = Depends(datab
         db.add(db_item)
         
     db.commit()
+    db.refresh(db_order)
+    
+    # Broadcast to kitchen and staff instantly
+    items = db.query(models.OrderItem).filter(models.OrderItem.order_id == order_id).all()
+    order_dict = schemas.OrderResponse.from_orm(db_order).dict()
+    order_dict["items"] = [schemas.OrderItemResponse.from_orm(item).dict() for item in items]
+    
+    await kitchen_manager.broadcast(order_dict)
+    await manager.broadcast(order_dict)
     
     # Generate Stripe Session
     try:

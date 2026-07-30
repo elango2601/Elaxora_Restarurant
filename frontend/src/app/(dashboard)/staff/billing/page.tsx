@@ -54,6 +54,29 @@ export default function BillingPage() {
 
   useEffect(() => {
     fetchOrders()
+    
+    const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WS_URL || "ws://127.0.0.1:3001"}/ws`)
+    
+    ws.onmessage = (event) => {
+      const payload = JSON.parse(event.data)
+      if (payload.id && payload.id.startsWith('ORD-')) {
+        if (payload.status !== 'completed' && payload.order_type === 'Dine-In') {
+          setOrders(prev => {
+            const exists = prev.some(o => o.id === payload.id)
+            if (exists) {
+              return prev.map(o => o.id === payload.id ? payload : o)
+            } else {
+              return [payload, ...prev]
+            }
+          })
+        } else {
+          // Remove if completed or cancelled
+          setOrders(prev => prev.filter(o => o.id !== payload.id))
+        }
+      }
+    }
+
+    return () => ws.close()
   }, [])
 
   const processPayment = async () => {
