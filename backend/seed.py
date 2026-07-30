@@ -1,64 +1,48 @@
-from database import engine, SessionLocal
-import models
+import models, database
+from auth import get_password_hash
 import datetime
-import uuid
-import json
+from sqlalchemy.orm import Session
 
 def seed_db():
-    print("Creating tables...")
-    models.Base.metadata.drop_all(bind=engine)
-    models.Base.metadata.create_all(bind=engine)
+    models.Base.metadata.drop_all(bind=database.engine)
+    models.Base.metadata.create_all(bind=database.engine)
+    db = database.SessionLocal()
     
-    db = SessionLocal()
-    
-    print("Seeding reservations...")
-    today = datetime.date.today()
-    
-    sample_reservations = [
-        {
-            "customer_name": "Elon Musk",
-            "phone": "+1 555-1234",
-            "email": "elon@spacex.com",
-            "branch": "Main Branch",
-            "date": today,
-            "time": datetime.time(19, 0),
-            "guests": 4,
-            "table_type": "VIP Lounge",
-            "special_requests": {"notes": "No paparazzi please."},
-            "status": "confirmed"
-        },
-        {
-            "customer_name": "Jane Doe",
-            "phone": "+1 555-5678",
-            "email": "jane@example.com",
-            "branch": "Downtown Premium",
-            "date": today,
-            "time": datetime.time(19, 30),
-            "guests": 2,
-            "table_type": "Window Seat",
-            "special_requests": {"Anniversary": True},
-            "status": "pending"
-        },
-        {
-            "customer_name": "John Smith",
-            "phone": "+1 555-9999",
-            "email": "john.smith@example.com",
-            "branch": "Main Branch",
-            "date": today + datetime.timedelta(days=1),
-            "time": datetime.time(12, 30),
-            "guests": 6,
-            "table_type": "Family Booth",
-            "special_requests": {"High Chair": True},
-            "status": "confirmed"
-        }
+    # Add System Settings
+    settings = models.SystemSettings(
+        restaurant_name="Elaxora",
+        email="contact@elaxora.com",
+        phone="+91 6374578233",
+        address="123 Luxury Lane, Culinary District",
+        tax_rate=8.5,
+        service_fee=15.0,
+        delivery_fee=5.0
+    )
+    db.add(settings)
+
+    # Add Users
+    users = [
+        models.User(name="Admin User", email="admin@elaxora.com", password_hash=get_password_hash("password123"), role="admin"),
+        models.User(name="Staff User", email="staff@elaxora.com", password_hash=get_password_hash("password123"), role="staff"),
+        models.User(name="Kitchen Staff", email="kitchen@elaxora.com", password_hash=get_password_hash("password123"), role="kitchen"),
+        models.User(name="Delivery Driver", email="delivery@elaxora.com", password_hash=get_password_hash("password123"), role="delivery")
     ]
-    
-    for r in sample_reservations:
-        db_res = models.Reservation(**r)
-        db.add(db_res)
-        
+    db.add_all(users)
+
+    # Add Menu Categories and Items (Tamil)
+    menu_items = [
+        models.MenuItem(name="Thalappakatti Biryani", description="Authentic Dindigul style mutton biryani.", price=250.00, category="Mains", is_available=True, image_url="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&q=80"),
+        models.MenuItem(name="Chicken 65", description="Spicy deep-fried chicken starter from Chennai.", price=180.00, category="Starters", is_available=True, image_url="https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=800&q=80"),
+        models.MenuItem(name="Filter Coffee", description="Classic South Indian degree coffee.", price=50.00, category="Beverages", is_available=True, image_url="https://images.unsplash.com/photo-1551030173-122aabc4489c?w=800&q=80"),
+        models.MenuItem(name="Masala Dosa", description="Crispy crepe served with sambar and chutney.", price=120.00, category="Mains", is_available=True, image_url="https://images.unsplash.com/photo-1589301760014-d929f39ce9b1?w=800&q=80"),
+        models.MenuItem(name="Chettinad Fish Fry", description="Spicy and aromatic shallow-fried fish.", price=220.00, category="Starters", is_available=True, image_url="https://images.unsplash.com/photo-1599487405270-8950ea605b0f?w=800&q=80"),
+        models.MenuItem(name="Gulab Jamun", description="Soft milk dumplings in rose-flavored sugar syrup.", price=80.00, category="Desserts", is_available=True, image_url="https://images.unsplash.com/photo-1598514982205-f36b96d1e8d4?w=800&q=80")
+    ]
+    db.add_all(menu_items)
+
     db.commit()
-    print("Seed complete! Added 3 dummy reservations.")
+    db.close()
+    print("Database seeded successfully!")
 
 if __name__ == "__main__":
     seed_db()

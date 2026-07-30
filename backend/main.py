@@ -706,3 +706,12 @@ def update_settings(settings_update: schemas.SystemSettingsBase, db: Session = D
     db.commit()
     db.refresh(settings)
     return success_response(schemas.SystemSettingsResponse.from_orm(settings).dict(), "Settings updated successfully")
+
+@app.get("/seed-database")
+def trigger_seed():
+    import seed
+    try:
+        seed.seed_db()
+        return {"message": "Database seeded successfully from the cloud!"}
+    except Exception as e:
+        return {"error": str(e)}
