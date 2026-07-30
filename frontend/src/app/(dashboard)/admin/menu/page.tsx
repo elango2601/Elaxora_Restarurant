@@ -32,7 +32,7 @@ export default function MenuManagementPage() {
 
   const fetchMenu = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/menu`)
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/menu`, { headers: { 'ngrok-skip-browser-warning': 'true' } })
       const data = await res.json()
       if (data.data) {
         setItems(data.data)
@@ -71,7 +71,7 @@ export default function MenuManagementPage() {
 
       const res = await fetch(url, {
         method,
-        headers: {
+        headers: { 'ngrok-skip-browser-warning': 'true',
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
@@ -98,7 +98,7 @@ export default function MenuManagementPage() {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/menu/${id}`, {
         method: 'DELETE',
-        headers: {
+        headers: { 'ngrok-skip-browser-warning': 'true',
           'Authorization': `Bearer ${token}`
         }
       })

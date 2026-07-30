@@ -31,7 +31,7 @@ export default function LoginPage() {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       })
       const data = await res.json()
@@ -70,9 +70,9 @@ export default function LoginPage() {
     setGoogleLoading(true)
     // Mocking OAuth logic for now since we don't have a Google provider configured
     try {
-      const res = await fetch('http://localhost:3001/google', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/google`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: "mock_google_id_token" })
       })
       const data = await res.json()

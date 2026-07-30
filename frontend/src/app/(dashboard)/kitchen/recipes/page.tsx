@@ -25,7 +25,7 @@ export default function RecipesPage() {
 
   const fetchMenu = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/menu`)
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/menu`, { headers: { 'ngrok-skip-browser-warning': 'true' } })
       if (!res.ok) throw new Error('Failed to fetch menu recipes')
       const data = await res.json()
       setMenu(data.data)

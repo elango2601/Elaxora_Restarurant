@@ -117,7 +117,7 @@ export default function POSPage() {
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/pos/orders`, {
         method: 'POST',
-        headers: {
+        headers: { 'ngrok-skip-browser-warning': 'true',
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },

@@ -19,7 +19,7 @@ export default function Step3Time() {
     const fetchSlots = async () => {
       try {
         setLoading(true)
-        const res = await fetch(`http://localhost:3001/available-slots?branch=${encodeURIComponent(data.branch)}&date=${data.date}`)
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/available-slots?branch=${encodeURIComponent(data.branch)}&date=${data.date}`, { headers: { 'ngrok-skip-browser-warning': 'true' } })
         const json = await res.json()
         if (json.success) {
           setSlots(json.data)

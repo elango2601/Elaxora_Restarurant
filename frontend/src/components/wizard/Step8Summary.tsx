@@ -45,9 +45,9 @@ export default function Step8Summary() {
         special_requests: data.specialRequests
       }
 
-      const res = await fetch('http://localhost:3001/reservation', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/reservation`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'ngrok-skip-browser-warning': 'true', 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })
       

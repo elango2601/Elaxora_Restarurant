@@ -28,7 +28,7 @@ export default function ReservationsPage() {
     try {
       const token = document.cookie.split('; ').find(row => row.startsWith('elaxora_token='))?.split('=')[1]
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/reservations`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'ngrok-skip-browser-warning': 'true', 'Authorization': `Bearer ${token}` }
       })
       const data = await res.json()
       if (data.data) {
@@ -71,7 +71,7 @@ export default function ReservationsPage() {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/reservation/status`, {
         method: 'PATCH',
-        headers: {
+        headers: { 'ngrok-skip-browser-warning': 'true',
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },

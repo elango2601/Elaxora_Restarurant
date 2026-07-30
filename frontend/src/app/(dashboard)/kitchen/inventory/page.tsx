@@ -24,7 +24,7 @@ export default function InventoryPage() {
     try {
       const token = document.cookie.split('; ').find(row => row.startsWith('elaxora_token='))?.split('=')[1]
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/admin/inventory`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'ngrok-skip-browser-warning': 'true', 'Authorization': `Bearer ${token}` }
       })
       if (!res.ok) throw new Error('Failed to fetch inventory')
       const data = await res.json()
@@ -45,7 +45,7 @@ export default function InventoryPage() {
       const token = document.cookie.split('; ').find(row => row.startsWith('elaxora_token='))?.split('=')[1]
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/admin/inventory/${id}`, {
         method: 'PUT',
-        headers: {
+        headers: { 'ngrok-skip-browser-warning': 'true',
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },

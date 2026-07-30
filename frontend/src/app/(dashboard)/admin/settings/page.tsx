@@ -78,7 +78,7 @@ export default function SettingsPage() {
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/settings`, {
         method: 'PATCH',
-        headers: {
+        headers: { 'ngrok-skip-browser-warning': 'true',
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },

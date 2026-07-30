@@ -25,7 +25,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
   const fetchSettings = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/settings`, { cache: 'no-store' })
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/settings`, { cache: 'no-store', headers: { 'ngrok-skip-browser-warning': 'true' } })
       if (res.ok) {
         const data = await res.json()
         setSettings(data.data)

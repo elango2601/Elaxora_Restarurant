@@ -28,8 +28,8 @@ export default function CustomersPage() {
       const token = document.cookie.split('; ').find(row => row.startsWith('elaxora_token='))?.split('=')[1]
       
       const [usersRes, ordersRes] = await Promise.all([
-        fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/admin/users`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/orders`, { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/admin/users`, { headers: { 'ngrok-skip-browser-warning': 'true', 'Authorization': `Bearer ${token}` } }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/orders`, { headers: { 'ngrok-skip-browser-warning': 'true', 'Authorization': `Bearer ${token}` } })
       ])
       
       const usersData = await usersRes.json()

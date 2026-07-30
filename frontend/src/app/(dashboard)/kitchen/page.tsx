@@ -30,8 +30,8 @@ export default function KitchenDashboard() {
   const fetchOrders = async () => {
     try {
       const token = document.cookie.split('; ').find(row => row.startsWith('elaxora_token='))?.split('=')[1]
-      const res = await fetch('http://localhost:3001/orders', {
-        headers: { 'Authorization': `Bearer ${token}` }
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/orders`, {
+        headers: { 'ngrok-skip-browser-warning': 'true', 'Authorization': `Bearer ${token}` }
       })
       const data = await res.json()
       if (data.data) {
@@ -79,9 +79,9 @@ export default function KitchenDashboard() {
   const updateOrderStatus = async (id: string, status: string) => {
     try {
       const token = document.cookie.split('; ').find(row => row.startsWith('elaxora_token='))?.split('=')[1]
-      const res = await fetch(`http://localhost:3001/order/${id}/status`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/order/${id}/status`, {
         method: 'PATCH',
-        headers: {
+        headers: { 'ngrok-skip-browser-warning': 'true',
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },

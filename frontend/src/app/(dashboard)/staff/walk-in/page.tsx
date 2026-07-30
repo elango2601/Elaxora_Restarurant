@@ -49,7 +49,7 @@ export default function WalkInPage() {
       // 1. Create Reservation
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/reservation`, {
         method: 'POST',
-        headers: {
+        headers: { 'ngrok-skip-browser-warning': 'true',
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
@@ -62,7 +62,7 @@ export default function WalkInPage() {
       // 2. Mark as Seated instantly
       await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/reservation/status`, {
         method: 'PATCH',
-        headers: {
+        headers: { 'ngrok-skip-browser-warning': 'true',
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
