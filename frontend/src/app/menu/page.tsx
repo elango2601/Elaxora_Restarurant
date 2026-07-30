@@ -23,7 +23,9 @@ export default function MenuPage() {
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const res = await fetch('http://localhost:3001/menu')
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/menu`, {
+          headers: { 'ngrok-skip-browser-warning': 'true' }
+        })
         const json = await res.json()
         if (json.success) {
           setItems(json.data)

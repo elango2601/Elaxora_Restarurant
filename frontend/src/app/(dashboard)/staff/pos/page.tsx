@@ -43,7 +43,9 @@ export default function POSPage() {
   }, [])
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/menu`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001"}/menu`, {
+      headers: { 'ngrok-skip-browser-warning': 'true' }
+    })
       .then(res => res.json())
       .then(data => {
         if (data.data) {
@@ -149,9 +151,9 @@ export default function POSPage() {
           </button>
         </div>
       )}
-      <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-120px)]">
+      <div className="flex flex-col lg:flex-row gap-6 h-auto lg:h-[calc(100vh-120px)] mb-8 lg:mb-0">
       {/* Menu Section */}
-      <div className="flex-1 flex flex-col min-h-0 bg-[#0a0a0c] border border-white/5 rounded-2xl overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-[50vh] lg:min-h-0 bg-[#0a0a0c] border border-white/5 rounded-2xl overflow-hidden">
         <div className="p-4 border-b border-white/5 space-y-4">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold font-serif gold-text-gradient">Point of Sale</h1>
@@ -221,7 +223,7 @@ export default function POSPage() {
       </div>
 
       {/* Cart Sidebar */}
-      <div className="w-full lg:w-[400px] flex flex-col bg-[#0a0a0c] border border-white/5 rounded-2xl overflow-hidden shrink-0">
+      <div className="w-full lg:w-[400px] h-[50vh] lg:h-full flex flex-col bg-[#0a0a0c] border border-white/5 rounded-2xl overflow-hidden shrink-0">
         <div className="p-4 border-b border-white/5 flex justify-between items-center bg-black/20">
           <h2 className="text-xl font-bold flex items-center gap-2">
             <ShoppingBag className="text-brand-gold" /> Current Order
