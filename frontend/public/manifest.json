@@ -1,0 +1,16 @@
+{
+  "name": "Elaxora RMS",
+  "short_name": "Elaxora",
+  "description": "Elaxora Restaurant Management System",
+  "start_url": "/login",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#D4AF37",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}

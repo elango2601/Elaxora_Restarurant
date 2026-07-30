@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+@plugin "tailwindcss-animate";
+
+@theme {
+  --font-sans: var(--font-inter);
+  
+  /* Brand colors */
+  --color-brand-gold: #d4af37;
+  --color-brand-purple: #4a154b;
+  --color-brand-dark: #0f0f11;
+  --color-brand-glass: rgba(255, 255, 255, 0.05);
+  --color-brand-glass-hover: rgba(255, 255, 255, 0.1);
+  --color-brand-border: rgba(212, 175, 55, 0.2);
+
+  /* Shadcn standard vars adjusted for dark luxury theme */
+  --color-background: var(--color-brand-dark);
+  --color-foreground: #ffffff;
+
+  --color-card: rgba(20, 20, 22, 0.6);
+  --color-card-foreground: #ffffff;
+
+  --color-popover: rgba(20, 20, 22, 0.95);
+  --color-popover-foreground: #ffffff;
+
+  --color-primary: var(--color-brand-gold);
+  --color-primary-foreground: #000000;
+
+  --color-secondary: var(--color-brand-glass);
+  --color-secondary-foreground: #ffffff;
+
+  --color-muted: rgba(255, 255, 255, 0.1);
+  --color-muted-foreground: #a1a1aa;
+
+  --color-accent: var(--color-brand-glass-hover);
+  --color-accent-foreground: #ffffff;
+
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+
+  --color-border: var(--color-brand-border);
+  --color-input: rgba(255, 255, 255, 0.1);
+  --color-ring: var(--color-brand-gold);
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+:root {
+  --radius: 0.75rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased min-h-screen;
+    background: radial-gradient(circle at 50% -20%, #2a2a35 0%, #0f0f11 60%);
+    background-attachment: fixed;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-brand-glass backdrop-blur-md border border-brand-border rounded-xl shadow-[0_8px_32px_0_rgba(0,0,0,0.37)];
+  }
+  .glass-panel-hover {
+    @apply hover:bg-brand-glass-hover transition-all duration-300;
+  }
+  .gold-text-gradient {
+    background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
